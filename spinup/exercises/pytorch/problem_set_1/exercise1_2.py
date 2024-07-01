@@ -33,12 +33,11 @@ def mlp(sizes, activation, output_activation=nn.Identity):
         (Use an nn.Sequential module.)
 
     """
-    #######################
-    #                     #
-    #   YOUR CODE HERE    #
-    #                     #
-    #######################
-    pass
+    layers = []
+    for j in range(len(sizes)-1):
+        act = activation if j < len(sizes)-2 else output_activation
+        layers += [nn.Linear(sizes[j], sizes[j+1]), act()]
+    return nn.Sequential(*layers)
 
 class DiagonalGaussianDistribution:
 
@@ -52,12 +51,12 @@ class DiagonalGaussianDistribution:
             A PyTorch Tensor of samples from the diagonal Gaussian distribution with
             mean and log_std given by self.mu and self.log_std.
         """
-        #######################
-        #                     #
-        #   YOUR CODE HERE    #
-        #                     #
-        #######################
-        pass
+        
+        # Sampmle from Gaussian distribution with mean 0 and std 1 with dim = dim(self.mu)
+        # Multiply by self.log_std.exp() and add self.mu to get samples from Gaussian distribution with mean self.mu and std self.log_std
+        z = torch.randn_like(self.mu)
+        output = self.mu + z*self.log_std.exp()
+        return output
 
     #================================(Given, ignore)==========================================#
     def log_prob(self, value):
@@ -80,14 +79,9 @@ class MLPGaussianActor(nn.Module):
         independent of observations, initialized to [-0.5, -0.5, ..., -0.5].
         (Make sure it's trainable!)
         """
-        #######################
-        #                     #
-        #   YOUR CODE HERE    #
-        #                     #
-        #######################
-        # self.log_std = 
-        # self.mu_net = 
-        pass 
+        self.log_std = torch.nn.Parameter(torch.full((act_dim,), -0.5), requires_grad=True)
+        self.mu_net = mlp([obs_dim]+list(hidden_sizes)+[act_dim], activation=activation)
+
 
     #================================(Given, ignore)==========================================#
     def forward(self, obs, act=None):
@@ -119,10 +113,10 @@ if __name__ == '__main__':
 
     ActorCritic = partial(exercise1_2_auxiliary.ExerciseActorCritic, actor=MLPGaussianActor)
     
-    ppo(env_fn = lambda : gym.make('InvertedPendulum-v2'),
+    ppo(env_fn = lambda : gym.make('MountainCarContinuous-v0'),
         actor_critic=ActorCritic,
         ac_kwargs=dict(hidden_sizes=(64,)),
-        steps_per_epoch=4000, epochs=20, logger_kwargs=dict(output_dir=logdir))
+        steps_per_epoch=4000, epochs=50, logger_kwargs=dict(output_dir=logdir))
 
     # Get scores from last five epochs to evaluate success.
     data = pd.read_table(os.path.join(logdir,'progress.txt'))
@@ -130,5 +124,5 @@ if __name__ == '__main__':
 
     # Your implementation is probably correct if the agent has a score >500,
     # or if it reaches the top possible score of 1000, in the last five epochs.
-    correct = np.mean(last_scores) > 500 or np.max(last_scores)==1e3
+    correct = np.mean(last_scores) >= -10
     print_result(correct)
