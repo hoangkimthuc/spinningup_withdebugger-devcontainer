@@ -113,10 +113,10 @@ if __name__ == '__main__':
 
     ActorCritic = partial(exercise1_2_auxiliary.ExerciseActorCritic, actor=MLPGaussianActor)
     
-    ppo(env_fn = lambda : gym.make('MountainCarContinuous-v0'),
+    ppo(env_fn = lambda : gym.make('CartPole-v1'),
         actor_critic=ActorCritic,
         ac_kwargs=dict(hidden_sizes=(64,)),
-        steps_per_epoch=4000, epochs=50, logger_kwargs=dict(output_dir=logdir))
+        steps_per_epoch=4000, epochs=20, logger_kwargs=dict(output_dir=logdir))
 
     # Get scores from last five epochs to evaluate success.
     data = pd.read_table(os.path.join(logdir,'progress.txt'))
@@ -124,5 +124,5 @@ if __name__ == '__main__':
 
     # Your implementation is probably correct if the agent has a score >500,
     # or if it reaches the top possible score of 1000, in the last five epochs.
-    correct = np.mean(last_scores) >= -10
+    correct = np.mean(last_scores) >= 400
     print_result(correct)

@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 import numpy as np
 
+from gym.spaces import Box, Discrete
+from spinup.algos.pytorch.ppo.core import MLPCategoricalActor
 """
 
 Auxiliary code for Exercise 1.2. No part of the exercise requires you to 
@@ -39,7 +41,10 @@ class ExerciseActorCritic(nn.Module):
                  actor=None):
         super().__init__()
         obs_dim = observation_space.shape[0]
-        self.pi = actor(obs_dim, action_space.shape[0], hidden_sizes, activation)
+        if isinstance(action_space, Box):
+            self.pi = actor(obs_dim, action_space.shape[0], hidden_sizes, activation)
+        elif isinstance(action_space, Discrete):
+            self.pi = MLPCategoricalActor(obs_dim, action_space.n, hidden_sizes, activation)
         self.v  = MLPCritic(obs_dim, hidden_sizes, activation)
 
     def step(self, obs):

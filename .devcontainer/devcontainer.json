@@ -17,13 +17,8 @@
 			"extensions": [
 				"ms-python.python",
 				"ms-python.vscode-pylance",
-				"ms-vsliveshare.vsliveshare-pack",
 				"njpwerner.autodocstring",
 				"GitHub.copilot",
-				"donjayamanne.githistory",
-				"janisdd.vscode-edit-csv",
-				"KevinRose.vsc-python-indent",
-				"aaron-bond.better-comments",
 				"njqdev.vscode-python-typehint",
 				"ms-azuretools.vscode-docker"
 			]

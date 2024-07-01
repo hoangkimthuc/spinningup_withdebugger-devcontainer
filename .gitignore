@@ -8,3 +8,4 @@ data/
 .vscode/
 .DS_Store
 _build/
+!spinup/exercises/pytorch/problem_set_1/exercise1_2_auxiliary.py
